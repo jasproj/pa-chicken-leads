@@ -1,0 +1,12 @@
+# PA Chicken Farm Lead Collector - Python Dependencies
+
+# Core
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# Database
+supabase>=2.0.0
+
+# Optional: for better scraping
+# lxml>=4.9.0
+# selenium>=4.15.0  # If JavaScript rendering needed

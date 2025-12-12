@@ -1,0 +1,53 @@
+name: Collect PA Chicken Farm Leads
+
+on:
+  # Run weekly on Sunday at 6 AM UTC
+  schedule:
+    - cron: '0 6 * * 0'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      collector:
+        description: 'Which collector to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - dep
+          - nass
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 supabase
+      
+      - name: Run collectors
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NASS_API_KEY: ${{ secrets.NASS_API_KEY }}
+        working-directory: ./collectors
+        run: |
+          python run_collectors.py ${{ github.event.inputs.collector || 'all' }}
+      
+      - name: Show stats
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        working-directory: ./collectors
+        run: |
+          python run_collectors.py stats
